@@ -8,9 +8,9 @@ If you are using Domoticz and Mosquitto you can install as follows:
 Clone the repository:
 
 ```
-    cd ~/domoticz/www
-    git clone https://github.com/lokonli/z2mvis.git
-    cd z2mvis.git
+cd ~/domoticz/www
+git clone https://github.com/lokonli/z2mvis.git
+cd z2mvis
 ```
 
 The Zigbee Visualizer needs to communicate with your MQTT server via a websocket.
@@ -18,7 +18,7 @@ You have to enable the websocket interface in your MQTT server configuration.
 The folder mqttconfig contains a configuration file.
 
 ```
-cp mqttconfig/ws.conf /etc/mosquitto/conf.d/
+sudo cp mqttconfig/ws.conf /etc/mosquitto/conf.d/
 ```
 
 
