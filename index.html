@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script src="https://unpkg.com/viz.js@1.8.1/viz.js" type="javascript/worker"></script>
+<script src="https://unpkg.com/d3-graphviz@2.6.1/build/d3-graphviz.min.js"></script>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<div id="graph" style="text-align: center;"></div>
+<script>
+  var client = mqtt.connect("ws://192.168.178.18:9001") // you add a ws:// url here
+  client.subscribe("zigbee2mqtt/bridge/networkmap/graphviz")
+ var prevgraph = 0;
+  client.on("message", function (topic, payload) {
+    var graph = new TextDecoder("utf-8").decode(payload);
+    if(graph!==prevgraph) {
+      prevgraph = graph;
+      displayGraph(graph);
+    }
+
+    setTimeout( function() {
+      client.publish("zigbee2mqtt/bridge/networkmap", "graphviz");  
+    }, 10000);
+  })
+  client.on('connect', function () {
+    console.log('Connected');
+    client.publish("zigbee2mqtt/bridge/networkmap", "graphviz")  
+})
+
+var renderer = d3.select("#graph").graphviz({height:"700px", fit:true}).engine("dot");
+
+function displayGraph(content) {
+        renderer
+        .fade(true)
+        .renderDot(content);
+}
+
+</script>
+
