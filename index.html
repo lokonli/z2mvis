@@ -8,7 +8,7 @@
 <script src="config.js"></script>
 <div id="graph" style="text-align: center;"></div>
 <script>
-  var client = mqtt.connect(z2mvisConfig.mqttServer)
+  var client = mqtt.connect("ws://"+z2mvisConfig.mqttServer)
   client.subscribe("zigbee2mqtt/bridge/networkmap/graphviz")
  var prevgraph = 0;
   client.on("message", function (topic, payload) {

@@ -29,8 +29,13 @@ sudo service mosquitto stop
 sudo service mosquitto start
 ```
 
+Copy the default configuration:
 
-On line 10 of index.html fill in the IP adress of your Mosquitto server.
+```
+cp config_default.js config.js
+```
+
+Edit config.js with the IP address of the MQTT server, including the port of the websocket connection.
 
 After that use your browser to go to:
 
