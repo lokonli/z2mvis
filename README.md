@@ -25,7 +25,8 @@ sudo cp mqttconfig/ws.conf /etc/mosquitto/conf.d/
 Restart mosquitto:
 
 ```
-sudo service mosquitto restart
+sudo service mosquitto stop
+sudo service mosquitto start
 ```
 
 
