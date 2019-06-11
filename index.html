@@ -1,33 +1,97 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+<head>
+  <link rel="stylesheet" type="text/css" href="z2mvis.css">
+  </head>
 <body>
 <script src="//d3js.org/d3.v4.min.js"></script>
 <script src="https://unpkg.com/viz.js@1.8.1/viz.js" type="javascript/worker"></script>
 <script src="https://unpkg.com/d3-graphviz@2.6.1/build/d3-graphviz.min.js"></script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script src="config.js"></script>
+<div id="status"></div>Refresh mode: <button id="btn.manual" class="button" onclick="onManual()">Manual</button><button id="btn.auto" class="button" onclick="onAuto()">Auto</button>
 <div id="graph" style="text-align: center;"></div>
 <script>
-  var client = mqtt.connect("ws://"+z2mvisConfig.mqttServer)
+  function getSearchParameters() {
+      var prmstr = window.location.search.substr(1);
+      return prmstr != null && prmstr != "" ? transformToAssocArray(prmstr) : {};
+}
+
+function transformToAssocArray( prmstr ) {
+    var params = {};
+    var prmarr = prmstr.split("&");
+    for ( var i = 0; i < prmarr.length; i++) {
+        var tmparr = prmarr[i].split("=");
+        params[tmparr[0]] = tmparr[1];
+    }
+    return params;
+}
+
+function extend(obj, src) {
+    Object.keys(src).forEach(function(key) { obj[key] = src[key]; });
+    return obj;
+}
+var params = getSearchParameters();
+
+var setparams = {
+  renderer: 'dot'
+}
+
+extend(setparams, z2mvisConfig);
+extend(setparams, params);
+
+
+var state = {
+  connection: "idle",
+  refresh: "auto"
+}
+
+  var client = mqtt.connect("ws://"+setparams.mqttserver)
+  client.on('error', function(err) {
+    console.log("mqtt error");
+  });
+
+  client.stream.on('error', function(err) {
+//    console.log("mqtt connection error" + err);
+//    console.log(err);
+    state.connection = "Error";
+    renderState();
+  });
+
+function requestRefresh(delay) {
+  state.connection= 'refresh delay';
+  renderState();
+  setTimeout( function() {
+      state.connection= 'updating';
+      renderState();
+      client.publish("zigbee2mqtt/bridge/networkmap", "graphviz");  
+    }, delay);
+
+}
   client.subscribe("zigbee2mqtt/bridge/networkmap/graphviz")
  var prevgraph = 0;
   client.on("message", function (topic, payload) {
+    state.connection = 'ready';
+    renderState();
     var graph = new TextDecoder("utf-8").decode(payload);
     if(graph!==prevgraph) {
       prevgraph = graph;
       displayGraph(graph);
     }
-
-    setTimeout( function() {
-      client.publish("zigbee2mqtt/bridge/networkmap", "graphviz");  
-    }, 10000);
+    if(state.refresh=='auto')
+      requestRefresh(10000);
   })
+
   client.on('connect', function () {
     console.log('Connected');
-    client.publish("zigbee2mqtt/bridge/networkmap", "graphviz")  
-})
+    state.connection="ready";
+    renderState();  
 
-var renderer = d3.select("#graph").graphviz({height:"700px", fit:true}).engine("dot");
+    if(state.refresh=='auto')
+      requestRefresh(0);
+  })
+
+var renderer = d3.select("#graph").graphviz({height:"700px", fit:true}).engine(setparams.renderer);
 
 function displayGraph(content) {
         renderer
@@ -35,5 +99,50 @@ function displayGraph(content) {
         .renderDot(content);
 }
 
+function renderState()
+{
+  var html = "MQTT server: " + setparams.mqttserver;
+  html+= " State: "+state.connection;
+   html +=' Renderer: ' + setparams.renderer;
+   if(state.connection == 'Error') {
+     html += '<br><br> <h2>MQTT Connection error<br></h2>Check the MQTT server IP address and the MQTT configuration. <br>See readme on <a href="https://github.com/lokonli/z2mvis">Github</a><br>'
+   }
+  document.getElementById("status").innerHTML = html;
+}
+
+function renderButtons() {
+  var btnManual = document.getElementById("btn.manual");
+  var btnAuto = document.getElementById("btn.auto");
+  if(state.refresh=="auto") {
+    btnManual.classList.remove("selected");
+    btnAuto.classList.add("selected")
+  }
+  else {
+    btnManual.classList.add("selected");
+    btnAuto.classList.remove("selected")
+  }
+}
+/* Eventhandler for the Manual button */
+function onManual() {
+  state.refresh = "manual";
+  renderButtons();
+  if(state.connection=='ready')
+    requestRefresh(0);
+}
+
+/* Eventhandler for the Manual button */
+function onAuto() {
+  if(state.refresh!=='auto') {
+    state.refresh = "auto";
+    renderButtons();
+    if (state.connection == 'ready')
+      requestRefresh(0);
+  }
+}
+
+/* Event handler for the Auto button */
+
+renderState();
+renderButtons();
 </script>
 
