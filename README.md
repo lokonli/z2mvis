@@ -39,9 +39,30 @@ Edit config.js with the IP address of the MQTT server, including the port of the
 
 After that use your browser to go to:
 
+```
 http://IP-adres:port/z2mvis/
+```
 
 (Use the IP adress:port of your Domoticz server)
 
 Wait approximately 10 seconds, and then your zigbee network should become visible.
 It refreshes automatically every 10 seconds.
+
+## Settings
+
+You can set default parameters via the config.js file:
+
+```
+var z2mvisConfig = {
+    mqttserver : '192.168.178.18:9001',
+    renderer: 'dot'
+}
+```
+
+As alternative renderer 'circo'can be used.
+
+You can also set the parameters via the url. Example:
+
+```
+http://192.168.178.18:8080/z2mvis/?renderer=dot&mqttserver=192.168.178.18:9001
+```
