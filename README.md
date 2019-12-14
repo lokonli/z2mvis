@@ -1,7 +1,10 @@
 # z2mvis
 Zigbee2MQTT Network Visualizer
 
-Copy the file index.html to a webserver folder.
+![z2mvis](https://user-images.githubusercontent.com/22852111/70855310-37b3a000-1ec9-11ea-93bd-45ebd6afcecc.JPG)
+
+
+Copy the file index.html and z2mvis.css to a webserver folder.
 
 If you are using Domoticz and Mosquitto you can install as follows:
 
@@ -47,6 +50,13 @@ http://IP-adres:port/z2mvis/
 
 Wait approximately 10 seconds, and then your zigbee network should become visible.
 It refreshes automatically every 10 seconds.
+
+### Update
+
+```
+git pull
+```
+
 
 ## Settings
 
