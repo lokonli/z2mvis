@@ -5,5 +5,5 @@ Your MQTT server should provide a winsocket protocol on the indicated port
 */
 
 var z2mvisConfig = {
-    mqttServer : '192.168.178.18:9001'
+    mqttserver : '192.168.178.18:9001'
 }
