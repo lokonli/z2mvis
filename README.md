@@ -51,7 +51,13 @@ http://IP-adres:port/z2mvis/
 Wait approximately 10 seconds, and then your zigbee network should become visible.
 It refreshes automatically every 10 seconds.
 
+### Notes
+
+* z2mvis doesn't work when loaded over https. You must use http.
+
 ### Update
+
+If you have installed z2mvis with ```git clone```, you can update z2mvis by executing the following command in the z2mvis folder:
 
 ```
 git pull
